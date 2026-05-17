@@ -1,0 +1,477 @@
+/* ==========================================================================
+   RESET & SYSTEM VARIABLES
+   ========================================================================== */
+:root {
+    --bg-dark: #0a0a12;
+    --panel-bg: rgba(16, 16, 32, 0.65);
+    --neon-blue: #00f3ff;
+    --neon-purple: #9d4edd;
+    --neon-green: #39ff14;
+    --neon-pink: #ff007f;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border-glass: rgba(0, 243, 255, 0.2);
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cyberpunk grid background */
+.bg-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: 
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   HEADER & LAYOUT STRUCTURE
+   ========================================================================== */
+header {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+    background: linear-gradient(180deg, rgba(10,10,18,1) 0%, rgba(16,16,32,0.4) 100%);
+}
+
+.glow-text {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+}
+
+.glow-text .accent {
+    color: var(--neon-blue);
+}
+
+.subtitle {
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+.container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   GLASSMORPHISM DESIGN PANELS
+   ========================================================================== */
+.glass {
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-header {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.75rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--neon-blue);
+}
+
+.status-indicator.live {
+    width: 8px;
+    height: 8px;
+    background-color: var(--neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--neon-green);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+/* ==========================================================================
+   ROBOTIC SIMULATION ENVIRONMENT (THE STAGE)
+   ========================================================================== */
+.simulator-panel {
+    min-height: 580px;
+}
+
+.stage {
+    position: relative;
+    flex: 1;
+    background: radial-gradient(circle at center, #14142a 0%, #07070f 100%);
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Table surface bottom track line */
+.table-surface {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 35px;
+    background: linear-gradient(180deg, #1e1e38 0%, #0d0d1a 100%);
+    border-top: 3px solid var(--neon-purple);
+    box-shadow: 0 -4px 15px rgba(157, 78, 221, 0.4);
+}
+
+/* ==========================================================================
+   ROBOT MANIPULATION ARM SYSTEM
+   ========================================================================== */
+.robot-arm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.arm-track {
+    position: absolute;
+    top: 15px;
+    left: 5%;
+    width: 90%;
+    height: 6px;
+    background: #2d2d44;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.arm-beam {
+    position: absolute;
+    top: 15px;
+    left: 50px; /* Managed dynamically by JS */
+    width: 4px;
+    height: 100px; /* Managed dynamically by JS */
+    background: linear-gradient(90deg, #5c5c77, #3a3a4f);
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    transition: left 0.5s ease-in-out, height 0.5s ease-in-out;
+}
+
+.arm-gripper {
+    position: absolute;
+    top: 115px; /* Managed dynamically via JS relative to beam height */
+    left: 32px;  /* Calculated offset to align with center axis of beam */
+    width: 40px;
+    height: 16px;
+    border: 3px solid #8e9aaf;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+}
+
+/* Mechanical finger prongs */
+.arm-gripper::before, .arm-gripper::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    width: 5px;
+    height: 14px;
+    background: var(--neon-blue);
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+.arm-gripper::before { left: -3px; }
+.arm-gripper::after { right: -3px; }
+
+/* ==========================================================================
+   DYNAMIC INTERACTIVE BLOCKS
+   ========================================================================== */
+.block {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    background: rgba(10, 25, 47, 0.85);
+    border: 2px solid var(--neon-blue);
+    border-radius: 6px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: bold;
+    font-size: 1.3rem;
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.25), inset 0 0 8px rgba(0, 243, 255, 0.1);
+    cursor: default;
+    user-select: none;
+    z-index: 5;
+    transition: left 0.5s ease-in-out, bottom 0.5s ease-in-out;
+}
+
+/* Alternating color profiles across blocks for quick identification */
+.block:nth-child(even) {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 12px rgba(255, 0, 127, 0.25), inset 0 0 8px rgba(255, 0, 127, 0.1);
+}
+
+/* ==========================================================================
+   CONTROL DECK & STATUS READOUTS
+   ========================================================================== */
+.telemetry-bar {
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+}
+
+.telemetry-item {
+    padding: 0.75rem 1.2rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.telemetry-item.wide {
+    flex: 1;
+}
+
+.telemetry-item .label {
+    color: var(--text-muted);
+}
+
+.telemetry-item .value {
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.telemetry-item .accent {
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+}
+
+.controls-panel {
+    padding: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: rgba(10, 10, 20, 0.4);
+}
+
+/* Buttons Mechanics */
+.btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.75rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.btn-secondary {
+    background: rgba(148, 163, 184, 0.1);
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+.btn-secondary:hover:not(:disabled) {
+    background: var(--text-muted);
+    color: #000;
+}
+
+.btn-warn {
+    background: rgba(157, 78, 221, 0.15);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+}
+.btn-warn:hover:not(:disabled) {
+    background: var(--neon-purple);
+    color: #fff;
+    box-shadow: 0 0 15px var(--neon-purple);
+}
+
+.btn-danger {
+    background: rgba(255, 0, 127, 0.15);
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+}
+.btn-danger:hover:not(:disabled) {
+    background: var(--neon-pink);
+    color: #fff;
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+.btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    border-color: rgba(255,255,255,0.05);
+    color: var(--text-muted);
+    box-shadow: none !important;
+    background: rgba(255,255,255,0.02);
+}
+
+/* ==========================================================================
+   DOCUMENTATION / ACADEMIC CONTENT STYLES
+   ========================================================================== */
+.info-panel {
+    max-height: calc(100vh - 140px);
+}
+
+.scroll-content {
+    padding: 1.2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Custom modern scrollbar track configuration */
+.scroll-content::-webkit-scrollbar {
+    width: 6px;
+}
+.scroll-content::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+.scroll-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 243, 255, 0.2);
+    border-radius: 3px;
+}
+.scroll-content::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-blue);
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.info-card h3 {
+    color: var(--neon-blue);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+.info-card p {
+    color: var(--text-main);
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+.info-card strong {
+    color: var(--neon-purple);
+}
+
+.info-card ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.info-card ul li {
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    font-size: 1rem;
+}
+
+.info-card ul li::before {
+    content: "⚡";
+    position: absolute;
+    left: 0;
+    color: var(--neon-pink);
+    font-size: 0.8rem;
+    top: 1px;
+}
+
+.apps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.app-tag {
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+   FOOTER REGION
+   ========================================================================== */
+footer {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    letter-spacing: 1px;
+    background: #07070f;
+}
